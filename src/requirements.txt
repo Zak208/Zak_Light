@@ -1,0 +1,15 @@
+# Versions the program was built and tested with. Upgrade one at a time and run `pytest tests`.
+numpy==2.5.2
+pillow==12.3.0
+pystray==0.19.5
+fastapi==0.124.0
+starlette==0.50.0
+uvicorn==0.49.0
+pydantic==2.12.5
+pywebview==6.2.1
+hidapi==0.15.0
+# Strip capture (core/strip_capture.py) drives dxcam's internals: re-run the tests before upgrading it.
+dxcam==0.3.0
+opencv-python==4.13.0.92
+pycaw==20260927
+comtypes==1.4.17

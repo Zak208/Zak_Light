@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zak_light</title>
+  <link rel="icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+  <!-- Icons: one sprite, used as <svg class="ic"><use href="#i-name"/></svg> -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-monitor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></symbol>
+    <symbol id="i-music" viewBox="0 0 24 24"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></symbol>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M19 15l.8 2.2L22 18l-2.2.8L19 21l-.8-2.2L16 18l2.2-.8z"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><path d="M12 3a9 9 0 100 18c1.2 0 1.8-.9 1.8-1.7 0-1.3-1.2-1.6-1.2-2.8 0-1 .8-1.7 1.8-1.7H17a4 4 0 004-4c0-4.4-4-7.8-9-7.8z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></symbol>
+    <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+    <symbol id="i-power" viewBox="0 0 24 24"><path d="M12 3v9"/><path d="M6.3 6.6a8 8 0 1011.4 0"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></symbol>
+    <symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-3.5 10.9c.6.5 1 1.2 1 2V16h5v-.1c0-.8.4-1.5 1-2A6 6 0 0012 3z"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></symbol>
+  </svg>
+
+  <div class="app">
+    <!-- ===== header ===== -->
+    <header class="header">
+      <div class="brand">
+        <img class="brand-mark" src="/static/logo.png" alt="" width="32" height="32">
+        <span>Zak_light</span>
+      </div>
+      <span class="spacer"></span>
+      <div class="status" id="status" title="Estado del controlador USB">
+        <span class="dot" id="status-dot"></span><span id="status-text">Conectando…</span>
+      </div>
+      <button class="icon-btn on" id="power" aria-label="Encender o apagar" title="Encender / apagar (Espacio)">
+        <svg class="ic"><use href="#i-power"/></svg>
+      </button>
+    </header>
+
+    <div class="banner" id="banner" role="alert" hidden></div>
+
+    <!-- ===== main view ===== -->
+    <main class="scroll" id="view-main">
+      <section class="preview" aria-label="Vista previa de la tira">
+        <canvas id="preview"></canvas>
+        <span class="tag" id="preview-tag">Pantalla</span>
+        <div class="off" id="preview-off" hidden>Apagado</div>
+      </section>
+
+      <nav class="modes" id="modes" aria-label="Modo de iluminación">
+        <button class="tile" data-mode="screen" aria-pressed="true">
+          <span class="glyph"><svg class="ic"><use href="#i-monitor"/></svg></span>
+          <span><b>Pantalla</b><small>Sigue la imagen</small></span>
+        </button>
+        <button class="tile" data-mode="rhythm" aria-pressed="false">
+          <span class="glyph"><svg class="ic"><use href="#i-music"/></svg></span>
+          <span><b>Ritmo</b><small>Reacciona al audio</small></span>
+        </button>
+        <button class="tile" data-mode="effect" aria-pressed="false">
+          <span class="glyph"><svg class="ic"><use href="#i-sparkles"/></svg></span>
+          <span><b>Efectos</b><small>Animaciones</small></span>
+        </button>
+        <button class="tile" data-mode="static" aria-pressed="false">
+          <span class="glyph"><svg class="ic"><use href="#i-palette"/></svg></span>
+          <span><b>Color</b><small>Un solo color</small></span>
+        </button>
+      </nav>
+
+      <!-- Pantalla -->
+      <section class="panel" id="panel-screen">
+        <div class="card">
+          <h3>Estilo de imagen</h3>
+          <div class="seg" id="presets">
+            <button class="chip" data-preset="game" aria-pressed="false">Juego</button>
+            <button class="chip" data-preset="movie" aria-pressed="false">Película</button>
+            <button class="chip" data-preset="vivid" aria-pressed="false">Vívido</button>
+            <button class="chip" data-preset="soft" aria-pressed="false">Suave</button>
+          </div>
+          <div class="row">
+            <label class="label" for="sw-bars">Ignorar bandas negras<span class="sub">Para películas con barras arriba y abajo</span></label>
+            <span class="switch"><input type="checkbox" id="sw-bars"><i></i></span>
+          </div>
+          <div class="row stack" id="monitor-row" hidden>
+            <span class="label">Monitor</span>
+            <div class="seg" id="monitor-list"></div>
+          </div>
+          <div class="row">
+            <span class="label">Zonas de captura<span class="sub" id="zones-summary">—</span></span>
+            <button class="btn small" id="go-zones">Ajustar…</button>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Cómo se reparte la imagen</h3>
+          <svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="g-scene" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ff5a5a"/><stop offset=".35" stop-color="#ffd45a"/><stop offset=".65" stop-color="#5ac8ff"/><stop offset="1" stop-color="#a05aff"/></linearGradient></defs></svg>
+          <div class="styles" id="styles">
+            <button class="style-card" data-style="edge" aria-pressed="false"><svg viewBox="0 0 120 64" aria-hidden="true"><rect x="22" y="12" width="76" height="44" rx="3" fill="#0c0e17" stroke="rgba(255,255,255,.35)"/><rect x="23" y="13" width="74" height="42" rx="2" fill="url(#g-scene)" opacity=".55"/><rect x="24" y="14" width="9" height="9" rx="1.5" fill="#ff5a5a"/><rect x="24" y="30" width="9" height="9" rx="1.5" fill="#ffb35a"/><rect x="24" y="45" width="9" height="9" rx="1.5" fill="#5aff9a"/><rect x="38" y="14" width="9" height="9" rx="1.5" fill="#ff7a5a"/><rect x="56" y="14" width="9" height="9" rx="1.5" fill="#5ac8ff"/><rect x="74" y="14" width="9" height="9" rx="1.5" fill="#a05aff"/><rect x="88" y="14" width="9" height="9" rx="1.5" fill="#ff5ab0"/><rect x="87" y="30" width="9" height="9" rx="1.5" fill="#5a8aff"/><rect x="87" y="45" width="9" height="9" rx="1.5" fill="#5affe0"/><circle cx="13" cy="18" r="3" fill="#ff5a5a"/><circle cx="13" cy="34" r="3" fill="#ffb35a"/><circle cx="13" cy="50" r="3" fill="#5aff9a"/><circle cx="40" cy="5" r="3" fill="#ff7a5a"/><circle cx="60" cy="5" r="3" fill="#5ac8ff"/><circle cx="80" cy="5" r="3" fill="#a05aff"/><circle cx="107" cy="18" r="3" fill="#ff5ab0"/><circle cx="107" cy="34" r="3" fill="#5a8aff"/><circle cx="107" cy="50" r="3" fill="#5affe0"/></svg><b>Bordes</b><small>Cada LED copia el trozo de imagen que tiene delante. Es lo más fiel: ideal para películas y juegos.</small></button>
+            <button class="style-card" data-style="average" aria-pressed="false"><svg viewBox="0 0 120 64" aria-hidden="true"><rect x="22" y="12" width="76" height="44" rx="3" fill="#0c0e17" stroke="rgba(255,255,255,.35)"/><rect x="23" y="13" width="74" height="42" rx="2" fill="url(#g-scene)" opacity=".9"/><rect x="23" y="13" width="74" height="42" rx="2" fill="none" stroke="#c77dff" stroke-width="3" stroke-dasharray="6 4"/><circle cx="13" cy="18" r="3" fill="#c77dff"/><circle cx="13" cy="34" r="3" fill="#c77dff"/><circle cx="13" cy="50" r="3" fill="#c77dff"/><circle cx="40" cy="5" r="3" fill="#c77dff"/><circle cx="60" cy="5" r="3" fill="#c77dff"/><circle cx="80" cy="5" r="3" fill="#c77dff"/><circle cx="107" cy="18" r="3" fill="#c77dff"/><circle cx="107" cy="34" r="3" fill="#c77dff"/><circle cx="107" cy="50" r="3" fill="#c77dff"/></svg><b>Ambiente</b><small>Toda la tira toma un único color: la media de los bordes de la imagen. Muy suave, sin detalle.</small></button>
+            <button class="style-card" data-style="halves" aria-pressed="false"><svg viewBox="0 0 120 64" aria-hidden="true"><rect x="22" y="12" width="76" height="44" rx="3" fill="#0c0e17" stroke="rgba(255,255,255,.35)"/><rect x="23" y="13" width="37" height="42" rx="2" fill="#19b5a5" opacity=".75"/><rect x="60" y="13" width="37" height="42" rx="2" fill="#ff8a3c" opacity=".75"/><circle cx="13" cy="18" r="3" fill="#19b5a5"/><circle cx="13" cy="34" r="3" fill="#19b5a5"/><circle cx="13" cy="50" r="3" fill="#19b5a5"/><circle cx="40" cy="5" r="3" fill="#19b5a5"/><circle cx="60" cy="5" r="3" fill="#c9a06c"/><circle cx="80" cy="5" r="3" fill="#ff8a3c"/><circle cx="107" cy="18" r="3" fill="#ff8a3c"/><circle cx="107" cy="34" r="3" fill="#ff8a3c"/><circle cx="107" cy="50" r="3" fill="#ff8a3c"/></svg><b>Mitades</b><small>Los LED de la izquierda toman la media de la mitad izquierda; los de la derecha, la de la mitad derecha.</small></button>
+          </div>
+          <div id="edges-block">
+          <span class="label">Lados activos</span>
+          <p class="hint" style="margin:2px 0 0">Apaga un lado para que sus LED se queden sin luz.</p>
+          <div class="seg" id="edges" style="margin-top:8px">
+            <button class="chip" data-edge-i="0" aria-pressed="true">Izquierda</button>
+            <button class="chip" data-edge-i="1" aria-pressed="true">Arriba</button>
+            <button class="chip" data-edge-i="2" aria-pressed="true">Derecha</button>
+            <button class="chip" data-edge-i="3" aria-pressed="true">Abajo</button>
+          </div>
+          </div>
+          <div class="row sl">
+            <label class="label" for="sl-boost">Pulso con los graves<span class="sub">Con música, la tira late sobre la imagen</span></label>
+            <input type="range" id="sl-boost" min="0" max="1" step="0.05"><span class="val" id="v-boost">0%</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Ritmo -->
+      <section class="panel" id="panel-rhythm" hidden>
+        <div class="card">
+          <h3>Paleta</h3>
+          <div class="swatches" id="palettes"></div>
+        </div>
+        <div class="card">
+          <h3>Patrón</h3>
+          <div class="seg" id="patterns"></div>
+          <div class="row">
+            <label class="label" for="sl-sens">Sensibilidad</label>
+            <input type="range" id="sl-sens" min="0.5" max="3" step="0.1">
+            <span class="val" id="v-sens">1.5×</span>
+          </div>
+        </div>
+        <div class="card">
+          <h3>Espectro en vivo</h3>
+          <div class="eq" id="eq" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+      </section>
+
+      <!-- Efectos -->
+      <section class="panel" id="panel-effect" hidden>
+        <div class="card">
+          <h3>Efecto</h3>
+          <div class="seg" id="fx-groups" style="margin-bottom:12px">
+            <button class="chip" data-group="ambient" aria-pressed="true">Ambiente</button>
+            <button class="chip" data-group="show" aria-pressed="false">Espectáculo</button>
+          </div>
+          <p class="hint" id="fx-hint"></p>
+          <div class="fx" id="effects"></div>
+          <div class="row sl">
+            <label class="label" for="sl-speed">Velocidad</label>
+            <input type="range" id="sl-speed" min="0.2" max="3" step="0.1">
+            <span class="val" id="v-speed">1.0×</span>
+          </div>
+        </div>
+        <div class="card" id="card-fxcolors">
+          <h3>Colores y dirección</h3>
+          <p class="hint" id="fx-colors-hint">Toca uno de los colores de abajo y cámbialo con la paleta o con el selector de color.</p>
+          <div class="fxslots" id="fx-slots">
+            <label class="slot" id="slot0"><input type="color" id="fx-c0" aria-label="Color 1"><span>Color 1</span></label>
+            <label class="slot" id="slot1"><input type="color" id="fx-c1" aria-label="Color 2"><span>Color 2</span></label>
+            <label class="slot" id="slot2"><input type="color" id="fx-c2" aria-label="Color 3"><span>Color 3</span></label>
+          </div>
+          <div class="preset-colors" id="fx-swatches" aria-label="Colores puros"></div>
+          <div class="row" style="margin-top:14px"><button class="btn small" id="fx-reset">Restablecer los colores de este efecto</button></div>
+          <div class="row"><label class="label" for="sw-reverse">Invertir dirección</label><span class="switch"><input type="checkbox" id="sw-reverse"><i></i></span></div>
+          <div class="row"><label class="label" for="sw-mirror">Simetría (espejo)<span class="sub">El efecto se refleja a ambos lados</span></label><span class="switch"><input type="checkbox" id="sw-mirror"><i></i></span></div>
+        </div>
+      </section>
+
+      <!-- Color -->
+      <section class="panel" id="panel-static" hidden>
+        <div class="card picker">
+          <h3>Color</h3>
+          <div class="sv" id="sv"><canvas id="sv-canvas" width="300" height="150"></canvas><span class="knob" id="sv-knob"></span></div>
+          <div class="hue" id="hue"><span class="knob" id="hue-knob"></span></div>
+          <div class="row hexrow">
+            <span class="label">Código</span>
+            <input type="text" id="hex" maxlength="7" spellcheck="false" aria-label="Color en hexadecimal">
+          </div>
+          <div class="preset-colors" id="preset-colors" aria-label="Colores rápidos"></div>
+        </div>
+        <div class="card">
+          <h3>Blanco</h3>
+          <p class="hint">De cálido (luz de vela) a frío (luz de día).</p>
+          <div class="row">
+            <svg class="ic" style="color:#ffb066"><use href="#i-sun"/></svg>
+            <input type="range" id="sl-kelvin" min="1800" max="7500" step="50" value="3200" aria-label="Temperatura del blanco">
+            <svg class="ic" style="color:#b9d4ff"><use href="#i-sun"/></svg>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- ===== settings view ===== -->
+    <main class="scroll" id="view-settings" hidden>
+      <div class="subhead">
+        <button class="icon-btn" id="back" aria-label="Volver"><svg class="ic"><use href="#i-back"/></svg></button>
+        <h2>Ajustes</h2>
+      </div>
+
+      <div class="card">
+        <h3>Imagen</h3>
+        <div class="row stack"><span class="label">Rendimiento<span class="sub">No cambia los colores: solo el ritmo de actualización y el consumo.</span></span>
+          <div class="seg" id="performance-modes">
+            <button class="chip" type="button" data-performance="eco" aria-pressed="false">Eco · 20 FPS</button>
+            <button class="chip" type="button" data-performance="balanced" aria-pressed="false">Equilibrado · 40 FPS</button>
+            <button class="chip" type="button" data-performance="fluid" aria-pressed="false">Fluido · 60 FPS</button>
+          </div>
+        </div>
+        <div class="row"><label class="label" for="sl-gamma">Gamma<span class="sub">Curva de brillo de los LED</span></label>
+          <input type="range" id="sl-gamma" min="1" max="3" step="0.1"><span class="val" id="v-gamma">2.2</span></div>
+        <div class="row"><label class="label" for="sl-sat">Saturación</label>
+          <input type="range" id="sl-sat" min="0" max="3" step="0.05"><span class="val" id="v-sat">1.3</span></div>
+        <div class="row"><label class="label" for="sl-hdr">Compensación HDR<span class="sub">Solo si con HDR los colores se ven lavados; empieza en 0 % y ajusta a ojo.</span></label>
+          <input type="range" id="sl-hdr" min="0" max="1" step="0.05"><span class="val" id="v-hdr">0%</span></div>
+        <div class="row"><label class="label" for="sl-smooth">Suavizado<span class="sub">Más alto = cambios más rápidos</span></label>
+          <input type="range" id="sl-smooth" min="0.05" max="1" step="0.05"><span class="val" id="v-smooth">0.3</span></div>
+        <div class="row"><label class="label" for="sl-floor">Luz mínima<span class="sub">Evita apagones totales en escenas oscuras</span></label>
+          <input type="range" id="sl-floor" min="0" max="20" step="1"><span class="val" id="v-floor">2</span></div>
+        <div class="row"><label class="label" for="sl-fps">Fotogramas por segundo<span class="sub">Más = más fluido y algo más de CPU</span></label>
+          <input type="range" id="sl-fps" min="15" max="60" step="5"><span class="val" id="v-fps">40</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Calidad de luz</h3>
+        <div class="row sl"><label class="label" for="sl-wb-r">Rojo<span class="sub">Balance de blancos: baja un canal si la tira se ve teñida</span></label>
+          <input type="range" id="sl-wb-r" min="0.3" max="1" step="0.01"><span class="val" id="v-wb-r">1.00</span></div>
+        <div class="row sl"><label class="label" for="sl-wb-g">Verde</label>
+          <input type="range" id="sl-wb-g" min="0.3" max="1" step="0.01"><span class="val" id="v-wb-g">1.00</span></div>
+        <div class="row sl"><label class="label" for="sl-wb-b">Azul</label>
+          <input type="range" id="sl-wb-b" min="0.3" max="1" step="0.01"><span class="val" id="v-wb-b">1.00</span></div>
+        <div class="row sl"><label class="label" for="sl-dark">Luz con pantalla oscura<span class="sub">Un resplandor cálido muy suave cuando la imagen es negra</span></label>
+          <input type="range" id="sl-dark" min="0" max="0.3" step="0.01"><span class="val" id="v-dark">0%</span></div>
+        <div class="row sl"><label class="label" for="sl-power">Límite de potencia<span class="sub">Protege la fuente USB; baja el brillo máximo si hay cortes</span></label>
+          <input type="range" id="sl-power" min="0.05" max="1" step="0.05"><span class="val" id="v-power">100%</span></div>
+        <div class="row"><label class="label" for="sw-dither">Difuminado de color<span class="sub">Más matices en las zonas oscuras</span></label><span class="switch"><input type="checkbox" id="sw-dither"><i></i></span></div>
+        <div class="row"><label class="label" for="sw-adapt">Suavizado inteligente<span class="sub">Responde al instante en los cortes de escena</span></label><span class="switch"><input type="checkbox" id="sw-adapt"><i></i></span></div>
+        <div class="row"><label class="label" for="sw-trans">Transiciones suaves<span class="sub">Fundido al cambiar de modo o encender</span></label><span class="switch"><input type="checkbox" id="sw-trans"><i></i></span></div>
+        <div class="row stack">
+          <span class="label">Calibración por monitor<span class="sub" id="monitor-color-note">Guarda gamma, saturación, blancos y la compensación HDR para el monitor actual.</span></span>
+          <div class="row" style="flex-wrap:wrap">
+            <button class="btn small" id="monitor-color-save">Guardar para este monitor</button>
+            <button class="btn small" id="monitor-color-load">Restaurar</button>
+            <button class="btn danger small" id="monitor-color-delete">Olvidar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Audio</h3>
+        <p class="hint">El modo Ritmo escucha esta salida. La predeterminada sigue el dispositivo elegido en Windows.</p>
+        <div class="row" style="flex-wrap:wrap">
+          <label class="label" for="audio-device" style="flex:1 1 140px">Salida de audio</label>
+          <select id="audio-device" aria-label="Salida de audio" style="flex:2 1 190px"></select>
+          <button class="btn small" id="audio-refresh" title="Actualizar salidas de audio">↻</button>
+        </div>
+        <p class="hint" id="audio-device-note" style="margin:0"></p>
+      </div>
+
+      <div class="card" id="card-zones">
+        <h3>Zonas de la pantalla</h3>
+        <p class="hint">Cuántos LED hay en cada borde y qué parte de la imagen mira cada uno.</p>
+        <div class="quad">
+          <div class="row"><span class="label">Izquierda</span><div class="stepper" data-edge="left"></div></div>
+          <div class="row"><span class="label">Arriba</span><div class="stepper" data-edge="top"></div></div>
+          <div class="row"><span class="label">Derecha</span><div class="stepper" data-edge="right"></div></div>
+          <div class="row"><span class="label">Abajo</span><div class="stepper" data-edge="bottom"></div></div>
+        </div>
+        <div class="row"><label class="label" for="sl-margin">Distancia al borde<span class="sub">Qué tan adentro de la imagen miran</span></label>
+          <input type="range" id="sl-margin" min="0" max="15" step="0.5"><span class="val" id="v-margin">3.5%</span></div>
+        <div class="row"><label class="label" for="sl-box">Tamaño de cada zona</label>
+          <input type="range" id="sl-box" min="2" max="25" step="1"><span class="val" id="v-box">6%</span></div>
+        <div class="note" id="zones-note" hidden>Tus zonas están colocadas a mano. “Aplicar” las reemplaza por el reparto automático.</div>
+        <div class="row" style="flex-wrap:wrap">
+          <button class="btn primary" id="zones-apply">Aplicar</button>
+          <button class="btn" id="zones-reverse">Invertir sentido</button>
+          <button class="btn" id="zones-editor">Editor avanzado…</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Cableado y pruebas</h3>
+        <p class="hint">Si los colores salen cambiados (pides rojo y sale azul), elige otro orden.</p>
+        <div class="wires" id="wires"></div>
+        <div class="row tests" style="flex-wrap:wrap">
+          <button class="btn small" data-test="test_red"><span class="r">●</span> Rojo</button>
+          <button class="btn small" data-test="test_green"><span class="g">●</span> Verde</button>
+          <button class="btn small" data-test="test_blue"><span class="b">●</span> Azul</button>
+          <button class="btn small" data-test="test_white">○ Blanco</button>
+          <button class="btn small" data-test="test_edges">Bordes</button>
+          <button class="btn small" data-test="test_brightness_cycle">Ciclo de brillo</button>
+        </div>
+        <div class="row" id="test-active" hidden>
+          <span class="label">Prueba en curso</span><button class="btn warn small" id="test-stop">Terminar prueba</button>
+        </div>
+      </div>
+
+      <div class="card" id="card-wizard">
+        <h3>Asistente de la tira</h3>
+        <p class="hint">Descubre solo el orden de colores y el sentido de la tira, sin tocar nada a ciegas.</p>
+        <div id="wiz-start"><button class="btn primary" id="wiz-go">Empezar</button></div>
+        <div id="wiz-step" hidden>
+          <p class="hint" id="wiz-text" style="color:var(--text)"></p>
+          <div class="seg" id="wiz-choices"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Reglas por aplicación</h3>
+        <p class="hint">Al abrir un programa (un juego, un reproductor…) cambia el modo o el perfil solo, y al cerrarlo vuelve a lo anterior.</p>
+        <div class="row"><label class="label" for="sw-rules">Activar reglas</label><span class="switch"><input type="checkbox" id="sw-rules"><i></i></span></div>
+        <div id="rules-list"></div>
+        <div class="row" style="flex-wrap:wrap">
+          <select id="rule-app" aria-label="Aplicación" style="flex:1 1 140px"></select>
+          <button class="btn small" id="rule-refresh" title="Actualizar lista">↻</button>
+          <button class="btn primary small" id="rule-add">Añadir regla</button>
+        </div>
+        <div class="row" style="flex-wrap:wrap">
+          <select id="rule-mode" aria-label="Modo" style="flex:1 1 120px"><option value="">Sin cambiar modo</option><option value="screen">Pantalla</option><option value="rhythm">Ritmo</option><option value="effect">Efectos</option><option value="static">Color</option><option value="off">Apagar</option></select>
+          <select id="rule-profile" aria-label="Perfil" style="flex:1 1 120px"></select>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Horarios y despertador</h3>
+        <p class="hint">Enciende, apaga o cambia de ambiente a una hora. El amanecer sube la luz poco a poco.</p>
+        <div id="sched-list"></div>
+        <div class="row" style="flex-wrap:wrap">
+          <input type="text" id="sch-time" value="22:30" maxlength="5" style="width:70px" aria-label="Hora (HH:MM)">
+          <select id="sch-action" aria-label="Acción" style="flex:1 1 120px">
+            <option value="off">Apagar</option><option value="on">Encender</option><option value="sunrise">Amanecer</option>
+            <option value="mode">Cambiar modo</option><option value="profile">Cargar perfil</option><option value="brightness">Poner brillo</option>
+          </select>
+          <input type="text" id="sch-value" placeholder="valor" maxlength="40" style="flex:1 1 90px" aria-label="Valor">
+        </div>
+        <div class="seg" id="sch-days" style="margin-top:10px"></div>
+        <div class="row"><button class="btn primary small" id="sch-add">Añadir horario</button><span class="label sub" id="sch-hint" style="font-size:12px;color:var(--faint)"></span></div>
+        <div class="row sl"><label class="label" for="sl-idle">Apagar si no estoy<span class="sub">Minutos sin usar el PC (0 = nunca). No apaga mientras suene audio</span></label>
+          <input type="range" id="sl-idle" min="0" max="120" step="5"><span class="val" id="v-idle">Nunca</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Atajos globales y avisos</h3>
+        <div class="row"><label class="label" for="sw-hotkeys">Atajos de teclado<span class="sub">Funcionan también dentro de juegos</span></label><span class="switch"><input type="checkbox" id="sw-hotkeys"><i></i></span></div>
+        <ul class="hk" id="hk-list"></ul>
+        <div class="row"><label class="label" for="sw-notify">Notificaciones<span class="sub">Avisa si se corta el USB o otro programa pelea por la tira</span></label><span class="switch"><input type="checkbox" id="sw-notify"><i></i></span></div>
+      </div>
+
+      <div class="card">
+        <h3>Copia de seguridad</h3>
+        <p class="hint">Exporta todos tus ajustes y perfiles a un archivo, o restáuralos en otro PC.</p>
+        <div class="row" style="flex-wrap:wrap">
+          <button class="btn small" id="export">Exportar…</button>
+          <button class="btn small" id="import">Importar…</button>
+          <input type="file" id="import-file" accept="application/json,.json" hidden>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Perfiles</h3>
+        <p class="hint">Guardan brillo, colores, ritmo y efectos. No cambian el cableado ni las zonas.</p>
+        <div class="row">
+          <input type="text" id="profile-name" maxlength="40" placeholder="Nombre (p. ej. Noche)" aria-label="Nombre del perfil" style="flex:1">
+          <button class="btn primary small" id="profile-save">Guardar</button>
+        </div>
+        <div class="row">
+          <select id="profile-list" aria-label="Perfiles guardados" style="flex:1"></select>
+          <button class="btn small" id="profile-load">Cargar</button>
+          <button class="btn danger small" id="profile-delete">Borrar</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Sistema</h3>
+        <div class="row"><label class="label" for="sw-autostart">Iniciar con Windows<span class="sub">Arranca oculto en la bandeja</span></label>
+          <span class="switch"><input type="checkbox" id="sw-autostart"><i></i></span></div>
+        <div class="row sl"><label class="label" for="sl-autoclose">Cerrar la ventana si no la uso<span class="sub">Libera unos 450 MB. La tira sigue funcionando</span></label>
+          <input type="range" id="sl-autoclose" min="0" max="60" step="5"><span class="val" id="v-autoclose">Nunca</span></div>
+        <div class="row"><label class="label" for="sw-lowpower">Ventana de bajo consumo<span class="sub">Sin aceleración de GPU. Se aplica al reabrir</span></label>
+          <span class="switch"><input type="checkbox" id="sw-lowpower"><i></i></span></div>
+        <div class="row" style="flex-wrap:wrap">
+          <button class="btn small" id="open-data"><svg class="ic" style="width:15px;height:15px;vertical-align:-3px"><use href="#i-folder"/></svg> Carpeta de datos y registro</button>
+          <button class="btn small" id="reset">Restablecer imagen</button>
+          <button class="btn danger small" id="quit">Salir de Zak_light</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Acerca de</h3>
+        <p class="hint" id="about">Zak_light</p>
+        <p class="hint" style="margin:0">Atajos: Espacio enciende/apaga · 1–4 cambia de modo · + / − brillo · Esc vuelve.</p>
+      </div>
+
+      <div class="card">
+        <h3>Diagnóstico en vivo</h3>
+        <p class="hint" id="diagnostics">Esperando datos del motor…</p>
+        <button class="btn small" id="diagnostics-export">Exportar informe seguro…</button>
+      </div>
+
+      <div class="card">
+        <h3>Medición de rendimiento</h3>
+        <p class="hint">Elige el escenario, deja la app funcionando cinco minutos y exporta el resultado. No graba la pantalla ni programas abiertos.</p>
+        <div class="row" style="flex-wrap:wrap">
+          <select id="measurement-scenario" aria-label="Escenario de la medición" style="flex:1 1 160px">
+            <option value="desktop">Escritorio estático</option>
+            <option value="video">Vídeo</option>
+            <option value="game">Juego</option>
+          </select>
+          <button class="btn small" id="measurement-start">Empezar</button>
+          <button class="btn small" id="measurement-stop">Terminar</button>
+          <button class="btn small" id="measurement-export">Exportar…</button>
+        </div>
+        <p class="hint" id="measurement-status" style="margin:0">Sin medición en curso.</p>
+      </div>
+    </main>
+
+    <!-- ===== footer: brightness + profiles ===== -->
+    <footer class="footer" id="footer">
+      <div class="brightness">
+        <svg class="ic"><use href="#i-sun"/></svg>
+        <input type="range" id="sl-brightness" min="5" max="100" step="1" aria-label="Brillo">
+        <output id="v-brightness">85%</output>
+      </div>
+      <div class="bar">
+        <select id="quick-profile" aria-label="Cargar un perfil"><option value="">Perfiles…</option></select>
+        <button class="btn" id="open-settings"><svg class="ic" style="width:16px;height:16px;vertical-align:-3px"><use href="#i-gear"/></svg> Ajustes</button>
+      </div>
+    </footer>
+
+    <!-- ===== advanced zones editor ===== -->
+    <div class="editor" id="editor" hidden role="dialog" aria-label="Editor avanzado de zonas">
+      <div class="subhead" style="padding-top:14px">
+        <h2>Zonas avanzadas</h2>
+        <span class="spacer"></span>
+        <button class="btn small" id="editor-reset">Reparto automático</button>
+        <button class="btn primary small" id="editor-done">Listo</button>
+      </div>
+      <p style="margin:0 18px 8px;color:var(--faint);font-size:12.5px">Arrastra cada punto a la parte de la imagen que debe mirar ese LED. Los cuadros discontinuos son las zonas.</p>
+      <div class="stage"><div class="screen" id="editor-screen"></div></div>
+    </div>
+
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+  </div>
+
+  <script src="/static/core.js"></script>
+  <script src="/static/lists.js"></script>
+  <script src="/static/status.js"></script>
+  <script src="/static/preview.js"></script>
+  <script src="/static/views.js"></script>
+  <script src="/static/automation.js"></script>
+  <script src="/static/main.js"></script>
+</body>
+</html>

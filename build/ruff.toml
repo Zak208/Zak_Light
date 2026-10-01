@@ -1,0 +1,6 @@
+# Real-bug rules only (unused names, undefined names, bug-prone patterns); style is left alone.
+extend-exclude = ["dist", "build/work"]
+
+[lint]
+select = ["F", "E9", "B"]
+ignore = ["B905"]   # zip() without strict= : lengths are equal by construction here
